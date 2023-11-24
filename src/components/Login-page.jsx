@@ -2,44 +2,80 @@ import { Button, TextField } from '@mui/material'
 import axios from 'axios';
 import React, { useState } from 'react'
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 
 
 const Login = () => {
+
   
   const [email,setEmail] = useState('');
   const [password, Setpassword] = useState('');
 
   const navigate = useNavigate();
 
+  
+  const handleError = (err)=>{
 
-  const handleLogin = (e)=>{
-
-    e.preventDefault()
-
-    axios.post('http://localhost:5000/api/login' , {email,password})
-    .then(result =>{
-      console.log(result)
-          if(result.data === "Success"){
-
-            navigate('/')
-      
-      
-          }else{
-            alert(result.data)
-          }
+    toast.error(err, {
+      position: "bottom-left",
     })
-    .catch(err=> alert(err +'Record Doesnt Found!'))
-
-
-
-
   }
+
+
+
+  const handleSuccess = (msg)=>{
+
+    toast.success("Login successfully", {
+      position: toast.POSITION.TOP_CENTER
+  })
+
+  console.log(`handle succesful` ,msg)
+  }
+
+
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const result = await axios.post('http://localhost:5000/api/login', { email, password });
+      console.log('login api===>', JSON.stringify(result));
+
+      const token = result.data.token;
+      console.log(`token===>`,token)
+
+    localStorage.setItem('token', token)      
+
+  
+      const { success, message } = result.data; // Assuming the response data is structured this way
+  
+      if (success) {
+        handleSuccess(message);
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
+      } else {
+        handleError(message);
+        console.log('eerr==>', handleError);
+      }
+    } catch (err) {
+      alert(err.message + ' Record Doesnt Found!');
+    }
+  };
+  
   return (
+    
     <div>
+
+
        <div style={{marginLeft:'10rem'}} className='login_page'>
-       <h1 style={{textAlign:'center'}} >Login Now</h1>  
+       <h1 style={{textAlign:'center'}}>Login Now</h1>  
+
+
 
 
           <form onSubmit={handleLogin}>
@@ -50,7 +86,10 @@ const Login = () => {
           <TextField id="outlined-basic" label="Password" variant="outlined" value={password} onChange={(e)=>Setpassword(e.target.value)} />
             <Button variant="contained" type='submit'>Login</Button>
 
+
           </div>
+          <ToastContainer />
+
           </form>
 
         </div>

@@ -4,8 +4,17 @@ import { BrowserRouter as Router, Link } from 'react-router-dom'; // Import Brow
 import AppRoutes from './Routes';
 import Sidebar from './Sidebar';
 import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import { Login } from '@mui/icons-material';
 
 const App = () => {
+  const navigate = useNavigate();
+  const Logout = () => {
+    localStorage.removeItem('token'); 
+    navigate("/register");
+  };
+ 
   return (
 
       <div className="app">
@@ -24,6 +33,9 @@ const App = () => {
             <Link to='/register'>
             <Button>Register</Button>
             </Link>
+            
+            <Button style={{color:'red'}} onClick={Logout}>Logout</Button>
+          
 
          </div>
         </div>

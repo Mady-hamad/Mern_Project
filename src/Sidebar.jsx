@@ -25,6 +25,8 @@ const Sidebar = ({ toggleCustomerList }) => {
             <li style={{listStyle:'none'}}>
               <Link style={{color:'white', textDecoration:'none'}} to="/customer-list">Customer List</Link>
             </li>
+
+            
           </ul>
         </nav>
 

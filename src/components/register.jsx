@@ -3,6 +3,9 @@ import React, { useState } from 'react'
 import axios from 'axios';
 import AppRoutes from '../Routes'
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 
@@ -17,49 +20,80 @@ const Register = () => {
 
   const navigate = useNavigate();
 
+  const handleError = (err)=>{
+
+    toast.error(err, {
+      position: "bottom-left",
+    })
+  }
+
+
+  const handleSuccess = (msg)=>{
+
+    toast.success("Account has been successfully created", {
+      position: toast.POSITION.TOP_CENTER
+  })
+
+  console.log(`handle succesful` ,msg)
+  }
   
-  const handleSubmit = (e)=>{
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-
-    if(password === confirmPassword){
+  
+    if (password === confirmPassword) {
       console.log('Form submitted with username:', username);
       console.log('Email:', email);
       console.log('Password:', password);
+  
+      try {
+        const response = await axios.post(
+          'http://localhost:5000/api/register',{ username, email, password },
+          { withCredentials: true }
+
+        );
+  
+        console.log('This is axios data ==> ',response.data);
+
+        const {data} = response;
+
+        var {success , message} = data;
+        if(success){
+
+          handleSuccess(message);
+          
+          setTimeout(() => {
+
+            navigate('/login')
+            
+          }, 1000);
+
+          setUsername('');
+          setEmail('');
+          Setpassword('');
+          SetconfrimPassword('');
+          
+        }else {
+          handleError(message)
+
+}
 
 
+          console.log(`success msg-->` ,handleSuccess)
 
-      axios.post('http://localhost:5000/api/register', {username,email,password})
-      .then(result=>console.log(`this is axios data==>`, result))
-      .catch(err=> console.log(err));
+  
+  
+       
+      } catch (err) {
+        console.log(err);
+        // alert('An error occurred while creating your account.');
+        handleError(message)
 
-      alert("Your account has successfully created !")
-      navigate("/login");
-
-
-
-
-
-      
-
-
-      setUsername('')
-      setEmail('')
-      Setpassword('')
-      SetconfrimPassword('')
-      
-    }else{
+      }
+    } 
+  };
+  
 
 
-      alert("Password doesnt match confirm password!")
-
-    }
-
-
-
-
-  }
 
 
   return (
@@ -67,7 +101,12 @@ const Register = () => {
        <div style={{marginLeft:'10rem'}} className='login_page'>
        <h1 style={{textAlign:'center'}} >Register Now</h1>  
 
+
+       
+
           <div  className='login_card'>
+        <ToastContainer />
+
 
             <form style={{display:'flex' , flexDirection:'column' , gap:'10px'}} onSubmit={handleSubmit}>
           <TextField id="outlined-basic" label="Name" variant="outlined" value={username} onChange={(e)=>setUsername(e.target.value)} />
